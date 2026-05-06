@@ -1,9 +1,9 @@
 using MathTaskValidator.Api;
+using MathTaskValidator.Api.Services;
 using MathTaskValidator.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using MathTaskValidator.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +25,10 @@ builder.Services.AddSwaggerGen(options =>
     options.MapType<IFormFile>(() => new OpenApiSchema { Type = "string", Format = "binary" });
     options.DescribeAllParametersInCamelCase();
     options.UseInlineDefinitionsForEnums();
-  });
+});
 
-builder.Services.AddMediatR(cfg => {
+builder.Services.AddMediatR(cfg =>
+{
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
 
@@ -41,6 +42,8 @@ builder.Services.Configure<AppSettings>(builder.Configuration);
 
 //DI
 builder.Services.AddScoped<IUploadDataService, UploadDataService>();
+builder.Services.AddScoped<IMathProcessor, MathProcessor>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 var app = builder.Build();
 

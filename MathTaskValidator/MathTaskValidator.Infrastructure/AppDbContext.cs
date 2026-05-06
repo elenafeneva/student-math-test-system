@@ -33,7 +33,6 @@ namespace MathTaskValidator.Infrastructure
                 entity.ToTable("Students");
                 // ExternalId must be provided for students and must be unique
                 entity.Property(s => s.ExternalId).IsRequired();
-                entity.HasIndex(s => s.ExternalId).IsUnique();
                 entity.HasOne<Teacher>()
                     .WithMany(t => t.Students)
                     .HasForeignKey("TeacherId")

@@ -2,6 +2,6 @@
 {
     public interface IUploadDataService
     {
-        Task<bool> UploadDataAsync(IFormFile file);
+        Task<bool> UploadDataAsync(IFormFile file, string? teacherUniqueId = null);
     }
 }

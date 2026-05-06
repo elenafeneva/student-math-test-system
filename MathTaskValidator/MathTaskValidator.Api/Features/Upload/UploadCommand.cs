@@ -8,13 +8,13 @@ namespace MathTaskValidator.Api.Features
     {
         public class Request : IRequest<Response>
         {
-            public IFormFile File { get; set; } = null!;
+            public string TeacherUniqueId { get; set; }
+            public IFormFile File { get; set; }
         }
 
         public class Response
         {
-            public string JobId { get; set; } = string.Empty;
-            public string StatusUrl { get; set; } = string.Empty;
+            public bool Success { get; set; }
         }
 
         public class Validator : AbstractValidator<Request>
@@ -39,14 +39,8 @@ namespace MathTaskValidator.Api.Features
 
             public async Task<Response> Handle(Request request, CancellationToken cancellationToken)
             {
-                var jobId = Guid.NewGuid().ToString();
-                await _uploadDataService.UploadDataAsync(request.File);
-
-                return new Response
-                {
-                    JobId = Guid.NewGuid().ToString(),
-                    StatusUrl = "/api/exams/status/" + Guid.NewGuid().ToString()
-                 };
+                var success = await _uploadDataService.UploadDataAsync(request.File, request.TeacherUniqueId);
+                return new Response { Success = success };
             }
         }
     }

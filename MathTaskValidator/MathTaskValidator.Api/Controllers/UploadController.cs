@@ -15,7 +15,7 @@ namespace MathTaskValidator.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("upload")]
+        [HttpPost]
         public async Task<UploadCommand.Response> Upload([FromForm] UploadCommand.Request request)
             => await _mediator.Send(request);
     }

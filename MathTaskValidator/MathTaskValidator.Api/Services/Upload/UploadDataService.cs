@@ -1,7 +1,8 @@
-﻿using MathTaskValidator.Infrastructure;
-using MathTaskValidator.Core.Models;
+﻿using MathTaskValidator.Core.Models;
+using MathTaskValidator.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
+using static Azure.Core.HttpHeader;
 
 namespace MathTaskValidator.Api.Services
 {
@@ -10,12 +11,13 @@ namespace MathTaskValidator.Api.Services
         private readonly AppDbContext _context;
         private readonly AppSettings _appSettings;
 
-        public UploadDataService(AppDbContext context)
+        public UploadDataService(AppDbContext context, AppSettings appSettings)
         {
             _context = context;
+            _appSettings = appSettings;
         }
 
-        public async Task<bool> UploadDataAsync(IFormFile file)
+        public async Task<bool> UploadDataAsync(IFormFile file, string? teacherUniqueId = null)
         {
             try
             {
@@ -33,9 +35,12 @@ namespace MathTaskValidator.Api.Services
                 // Determine teacher element (root is expected to be the teacher)
                 var teacherElem = root;
 
-                //Identify Teacher
-                string? teacherUniqueId = GetAttributeValue(teacherElem, "ID", "Id", "id", "UniqueId");
-                if (string.IsNullOrWhiteSpace(teacherUniqueId))
+                //Identify Teacher. Prefer provided teacherUniqueId, otherwise read from XML.
+                string? xmlTeacherUniqueId = GetAttributeValue(teacherElem, "ID", "Id", "id", "UniqueId");
+                if (xmlTeacherUniqueId != teacherUniqueId)
+                    return false; // Mismatch between provided teacherUniqueId and XML;
+
+                if (string.IsNullOrWhiteSpace(xmlTeacherUniqueId))
                     return false;
 
                 // Load existing teacher with related students if present
@@ -43,13 +48,17 @@ namespace MathTaskValidator.Api.Services
                     .Include(t => t.Students)
                     .ThenInclude(s => s.Exams)
                     .ThenInclude(e => e.Tasks)
-                    .FirstOrDefaultAsync(t => t.UniqueId == teacherUniqueId);
+                    .FirstOrDefaultAsync(t => t.UniqueId == xmlTeacherUniqueId);
 
                 if (teacher is null)
                 {
-                    teacher = new Teacher(teacherUniqueId);
+                    teacher = new Teacher(xmlTeacherUniqueId);
                     _context.Teachers.Add(teacher);
                 }
+
+                // Save uploaded file and store generated id in the teacher's ExternalId
+                var fileId = Guid.NewGuid().ToString();
+                teacher.ExternalId = fileId;
 
                 // Process students for this teacher
                 var studentElements = teacherElem.Descendants().Where(e => string.Equals(e.Name.LocalName, "Student", StringComparison.OrdinalIgnoreCase));
@@ -62,8 +71,7 @@ namespace MathTaskValidator.Api.Services
                     var student = teacher?.Students?.FirstOrDefault(s => s.UniqueId == studentUniqueId);
                     if (student is null)
                     {
-
-                        student = new Student(studentUniqueId, teacher?.Id);
+                        student = new Student(studentUniqueId, teacher?.Id, fileId);
                         teacher?.Students.Add(student);
                     }
 
@@ -79,7 +87,7 @@ namespace MathTaskValidator.Api.Services
                         var exam = student.Exams.FirstOrDefault(x => x.UniqueId == examUniqueId);
                         if (exam is null)
                         {
-                            exam = new Exam(examUniqueId, student);
+                            exam = new Exam(examUniqueId, student, fileId);
                             student.Exams.Add(exam);
                         }
 
@@ -97,24 +105,50 @@ namespace MathTaskValidator.Api.Services
                             if (exists)
                                 continue;
 
-                            var task = new ExamTask { UniqueId = taskUniqueId, RawText = rawText, Exam = exam };
+                            var task = new ExamTask(taskUniqueId, rawText, fileId);
                             exam.Tasks.Add(task);
                         }
                     }
                 }
+
+                // Save everything in a transaction
+                await using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    SaveUploadedFileAsync(file, fileId);
+                }
+
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error processing uploaded file: {ex.Message}");
                 return false;
             }
         }
 
+        private async void SaveUploadedFileAsync(IFormFile file, string fileId)
+        {
+            var uploadsRoot = Path.Combine(Directory.GetCurrentDirectory(), _appSettings.UploadsPath ?? "uploads");
+            Directory.CreateDirectory(uploadsRoot);
+
+            var ext = Path.GetExtension(file.FileName);
+            var uniqueName = fileId + ext;
+            var savePath = Path.Combine(uploadsRoot, uniqueName);
+
+            await using (var fs = File.Create(savePath))
+            {
+                await file.CopyToAsync(fs);
+            }
+        }
+
+
         private static string? GetAttributeValue(XElement elem, params string[] names)
         {
-            foreach (var n in names)
+            foreach (var name in names)
             {
-                var attr = elem.Attribute(n);
+                var attr = elem.Attribute(name);
                 if (attr != null && !string.IsNullOrWhiteSpace(attr.Value))
                     return attr.Value.Trim();
             }

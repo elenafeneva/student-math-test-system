@@ -2,9 +2,15 @@ namespace MathTaskValidator.Core.Models
 {
     public class ExamResult
     {
-        public string ExamId { get; set; } = string.Empty;
+        public ExamResult(string uniqueId, Guid studentId)
+        {
+            ExamUniqueId = uniqueId;
+            StudentUniqueId = studentId;
+        }
 
-        public string StudentId { get; set; } = string.Empty;
+        public string ExamUniqueId { get; set; } = string.Empty;
+
+        public Guid StudentUniqueId { get; set; }
 
         public List<TaskResult> TaskResults { get; set; } = new List<TaskResult>();
 
