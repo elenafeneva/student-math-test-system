@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36915.13 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTaskValidator.Core", "MathTaskValidator.Core\MathTaskValidator.Core.csproj", "{6F678272-B11F-4312-8421-6B9B3F33C9BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTaskValidator.Infrastructure", "MathTaskValidator.Infrastructure\MathTaskValidator.Infrastructure.csproj", "{5B7FB417-12B9-416C-A4DA-C9F90EB1B28E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTaskValidator.Api", "MathTaskValidator.Api\MathTaskValidator.Api.csproj", "{D3FF72C5-0A7B-4A7D-9E76-21AFFA97544B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F678272-B11F-4312-8421-6B9B3F33C9BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F678272-B11F-4312-8421-6B9B3F33C9BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F678272-B11F-4312-8421-6B9B3F33C9BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F678272-B11F-4312-8421-6B9B3F33C9BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B7FB417-12B9-416C-A4DA-C9F90EB1B28E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B7FB417-12B9-416C-A4DA-C9F90EB1B28E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B7FB417-12B9-416C-A4DA-C9F90EB1B28E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B7FB417-12B9-416C-A4DA-C9F90EB1B28E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3FF72C5-0A7B-4A7D-9E76-21AFFA97544B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3FF72C5-0A7B-4A7D-9E76-21AFFA97544B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3FF72C5-0A7B-4A7D-9E76-21AFFA97544B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3FF72C5-0A7B-4A7D-9E76-21AFFA97544B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {32ADA56D-C092-4378-B9C5-D762F699597A}
+	EndGlobalSection
+EndGlobal
