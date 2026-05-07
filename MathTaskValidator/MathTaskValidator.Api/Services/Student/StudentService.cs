@@ -13,21 +13,12 @@ namespace MathTaskValidator.Api.Services
             _context = context;
         }
 
-        public async Task<Student> GetStudentByUniqueIdAsync(string studentUniqueId)
+        public async Task<Student?> GetStudentByUniqueIdAsync(string studentUniqueId)
         {
             return await _context.Students
                 .Include(s => s.Exams)
                 .ThenInclude(e => e.Tasks)
-                .FirstOrDefaultAsync(s => s.UniqueId == studentUniqueId) ?? new Student();
-        }
-
-
-        public async Task<List<Exam>> GetStudentExamsAsync(Guid studentId)
-        {
-            var studentExams = await _context.Exams
-                .Where(e => e.StudentId == studentId)
-                .ToListAsync();
-            return studentExams;
+                .FirstAsync(s => s.UniqueId == studentUniqueId);
         }
 
         public async Task<List<Student>> GetStudentsByTeacherUniqueIdAsync(string teacherUniqueId)

@@ -35,7 +35,8 @@ namespace MathTaskValidator.App
             try
             {
                 using var client = new HttpClient();
-                var url = $"https://localhost:44376/api/teachers/{System.Uri.EscapeDataString(teacherId)}/students/results";
+                var baseUrl = AppSettings.GetApiBaseUrl();
+                var url = $"{baseUrl}/api/students/resultsByTeacher/{Uri.EscapeDataString(teacherId)}";
                 var resp = await client.GetAsync(url);
                 if (!resp.IsSuccessStatusCode)
                 {
@@ -45,11 +46,17 @@ namespace MathTaskValidator.App
 
                 var api = await resp.Content.ReadFromJsonAsync<TeacherApiResponse>();
                 StudentsList.Items.Clear();
-                foreach (var s in api.StudentsResults)
+                if(api?.StudentsResults == null || api?.StudentsResults.Count == 0)
                 {
-                    var first = s.ExamResults.FirstOrDefault();
+                    MessageBox.Show("No students found.");
+                    return;
+                }
+
+                foreach (var studentResult in api.StudentsResults)
+                {
+                    var first = studentResult.ExamResults.FirstOrDefault();
                     var summary = first == null ? "No exams" : $"{first.CorrectCount}/{first.TotalCount} ({first.Percentage:F0}%)";
-                    StudentsList.Items.Add(new StudentResultDto { StudentUniqueId = s.StudentUniqueId, Summary = summary });
+                    StudentsList.Items.Add(new StudentResultDto { StudentUniqueId = studentResult.StudentUniqueId, Summary = summary });
                 }
             }
             catch (Exception ex)

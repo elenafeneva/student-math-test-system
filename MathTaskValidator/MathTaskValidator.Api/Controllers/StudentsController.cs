@@ -21,5 +21,12 @@ namespace MathTaskValidator.Api.Controllers
             var request = new QueryStudentResultsCommand.Request { StudentUniqueId = uniqueId };
             return await _mediator.Send(request);
         }
+
+        [HttpGet("resultsByTeacher/{teacherUniqueId}")]
+        public async Task<QueryStudentsResultsCommand.Response> GetStudentsResultsByTeacherId([FromRoute] string teacherUniqueId)
+        {
+            var request = new QueryStudentsResultsCommand.Request { TeacherUniqueId = teacherUniqueId };
+            return await _mediator.Send(request);
+        }
     }
 }

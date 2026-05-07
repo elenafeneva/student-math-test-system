@@ -27,7 +27,6 @@ namespace MathTaskValidator.Api.Features
             }
         }
 
-
         public class Handler : IRequestHandler<Request, Response>
         {
             private readonly IStudentService _studentService;
@@ -45,11 +44,11 @@ namespace MathTaskValidator.Api.Features
                 if (student is null)
                     return new Response();
 
-                var studentExams = await _studentService.GetStudentExamsAsync(student.Id);
-                if (!studentExams.Any())
+                var studentExams = student.Exams.ToList();
+                if (studentExams.Count() <= 0)
                     return new Response();
 
-                var studentExamResults = _mathProcessor.ProcessExamResultsAsync(studentExams);
+                var studentExamResults = _mathProcessor.ProcessExamResults(studentExams);
                 return new Response { ExamResults = studentExamResults };
             }
         }

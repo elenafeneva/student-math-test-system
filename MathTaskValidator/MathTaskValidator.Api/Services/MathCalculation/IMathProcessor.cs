@@ -5,6 +5,6 @@ namespace MathTaskValidator.Api.Services
 {
     public interface IMathProcessor
     {
-        List<ExamResult> ProcessExamResultsAsync(List<Exam> examResults);
+        List<ExamResult> ProcessExamResults(List<Exam> examResults);
     }
 }

@@ -65,7 +65,7 @@ namespace MathTaskValidator.App
                     // Prepare the file stream and content. Keep the stream alive until the request completes.
                     using var fileStream = File.OpenRead(filePath);
                     using var fileContent = new StreamContent(fileStream);
-                    fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/xml");                    
 
                     using var content = new MultipartFormDataContent();
 
@@ -79,8 +79,9 @@ namespace MathTaskValidator.App
                         content.Add(new StringContent(teacherId), "TeacherUniqueId");
                     }
 
-                    // Replace with your actual local API URL
-                    var response = await client.PostAsync("https://localhost:44376/api/upload", content);
+                    // Use configured API base URL
+                    var uploadUrl = AppSettings.GetApiBaseUrl().TrimEnd('/') + "/api/upload";
+                    var response = await client.PostAsync(uploadUrl, content);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -126,7 +127,7 @@ namespace MathTaskValidator.App
             try
             {
                 using var client = new HttpClient();
-                var url = $"https://localhost:44376/api/students/{Uri.EscapeDataString(studentId)}/results";
+                var url = AppSettings.GetApiBaseUrl().TrimEnd('/') + $"/api/students/{Uri.EscapeDataString(studentId)}/results";
                 var response = await client.GetAsync(url);
                 if (!response.IsSuccessStatusCode)
                 {

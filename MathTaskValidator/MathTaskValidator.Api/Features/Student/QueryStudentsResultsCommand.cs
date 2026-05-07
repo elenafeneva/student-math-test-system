@@ -52,8 +52,8 @@ namespace MathTaskValidator.Api.Features
                 var results = new List<Response.StudentResult>();
                 foreach (var student in students)
                 {
-                    var studentExams = await _studentService.GetStudentExamsAsync(student.Id);
-                    var studentExamResults = _mathProcessor.ProcessExamResultsAsync(studentExams);
+                    var studentExams = student.Exams.ToList();
+                    var studentExamResults = _mathProcessor.ProcessExamResults(studentExams);
 
                     results.Add(new Response.StudentResult
                     {
